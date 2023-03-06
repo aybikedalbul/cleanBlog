@@ -1,0 +1,36 @@
+const fs = require("fs");
+const path2 = require("path");
+
+const Photo = require("../models/Photo.js");
+
+exports.getAllPosts = async (req, res) => {
+  const photos = await Photo.find({}).sort("-dateCreated");
+  res.render("./index", {
+    photos,
+  });
+};
+exports.getPost = async (req, res) => {
+  const photo = await Photo.findById(req.params.id);
+  res.render("post", {
+    photo,
+  });
+};
+
+exports.updatePost = async (req, res) => {
+  const post = await Photo.findOne({ _id: req.params.id });
+  post.title = req.body.title;
+  post.detail = req.body.detail;
+
+  post.save();
+  res.redirect(`/post/${req.params.id}`);
+};
+exports.deletePost = async (req, res) => {
+  const photo = await Photo.findOne({ _id: req.params.id });
+  await Photo.findByIdAndRemove(req.params.id);
+  res.redirect("/");
+};
+
+exports.createPost = async (req, res) => {
+  await Photo.create(req.body);
+  res.redirect("/");
+};
